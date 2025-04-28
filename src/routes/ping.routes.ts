@@ -10,11 +10,11 @@ router.use(protect);
 // Get all pings
 router.get('/', getPings);
 
-// Send a ping
-router.post('/send', sendPing);
+// Send a ping to a user
+router.post('/:userId', sendPing);
 
-// Respond to ping (accept/decline)
-router.put('/:id/respond', respondToPing);
+// Respond to a ping
+router.post('/:pingId/respond', respondToPing);
 
 // Delete/cancel a ping
 router.delete('/:id', deletePing);

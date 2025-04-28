@@ -1,17 +1,20 @@
 import mongoose from 'mongoose';
 
 /**
+ * Ping status types
+ */
+export type PingStatus = 'pending' | 'accepted' | 'declined' | 'expired';
+
+/**
  * Ping document interface
  */
 export interface IPing extends mongoose.Document {
   sender: mongoose.Types.ObjectId;
-  receiver: mongoose.Types.ObjectId;
-  status: 'pending' | 'accepted' | 'declined';
-  distance: number; // Distance in meters when ping was sent
-  message?: string; // Optional message with ping
+  recipient: mongoose.Types.ObjectId;
+  status: PingStatus;
   createdAt: Date;
-  updatedAt: Date;
-  expiresAt: Date; // Pings expire after a certain time if not responded to
+  respondedAt?: Date;
+  expiresAt: Date;
 }
 
 /**
@@ -23,40 +26,31 @@ const PingSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  receiver: {
+  recipient: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
   status: {
     type: String,
-    enum: ['pending', 'accepted', 'declined'],
+    enum: ['pending', 'accepted', 'declined', 'expired'],
     default: 'pending'
   },
-  distance: {
-    type: Number,
-    required: true
+  createdAt: {
+    type: Date,
+    default: Date.now
   },
-  message: {
-    type: String,
-    maxlength: [200, 'Message cannot be more than 200 characters']
+  respondedAt: {
+    type: Date
   },
   expiresAt: {
     type: Date,
-    required: true,
-    default: function() {
-      // Set default expiration to 24 hours from now
-      const date = new Date();
-      date.setHours(date.getHours() + 24);
-      return date;
-    }
+    required: true
   }
-}, {
-  timestamps: true
 });
 
 // Create indexes for faster querying
-PingSchema.index({ sender: 1, receiver: 1 });
+PingSchema.index({ sender: 1, recipient: 1 });
 PingSchema.index({ status: 1 });
 PingSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 }); // TTL index for auto-deletion
 

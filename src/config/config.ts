@@ -16,9 +16,6 @@ interface ServerConfig {
   corsOrigins: string[];
 }
 
-console.log(process.env);
-
-
 /**
  * Configuration object with environment variables and defaults
  */

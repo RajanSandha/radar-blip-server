@@ -92,4 +92,58 @@ Backend server for the RadarBlip proximity app. Built with Node.js, Express, Mon
 
 ## License
 
-This project is licensed under the MIT License. 
+This project is licensed under the MIT License.
+
+## Setup
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Create a `.env` file in the root directory with the following variables:
+```
+PORT=5001
+MONGO_URI=mongodb://localhost:27017/localping
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRE=30d
+```
+
+3. Start the development server:
+```bash
+npm run dev
+```
+
+## API Documentation
+
+The API documentation is available at `/api-docs` when the server is running.
+
+## Available Scripts
+
+- `npm run dev`: Start the development server with hot reload
+- `npm run build`: Build the project for production
+- `npm start`: Start the production server
+- `npm test`: Run tests
+
+## Troubleshooting
+
+### MongoDB Geo Index Error
+
+If you encounter the following error:
+```
+error processing query: ns=radar-blip.usersTree: $and $not _id $eq ObjectId(...) $not blockedUsers $eq ObjectId(...) GEONEAR field=location maxdist=2000 isNearSphere=0 Sort: {} Proj: { _id: 1, gender: 1, isOnline: 1, lastActive: 1, location: 1 } planner returned error :: caused by :: unable to find index for $geoNear query
+```
+
+This indicates that the required 2dsphere index is missing or incorrectly configured. To fix it:
+
+1. Run the rebuild indexes script:
+```bash
+npm run rebuild-indexes
+```
+
+2. Or manually create the index in MongoDB shell:
+```javascript
+db.users.createIndex({ "location.coordinates": "2dsphere" })
+```
+
+The application requires a 2dsphere index on the User collection's location.coordinates field for geo-location queries to work properly. 

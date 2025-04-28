@@ -32,6 +32,10 @@ export interface IUser extends mongoose.Document {
   settings: IUserSettings;
   isOnline: boolean;
   lastActive: Date;
+  connections: mongoose.Types.ObjectId[];
+  incomingConnectionRequests: mongoose.Types.ObjectId[];
+  outgoingConnectionRequests: mongoose.Types.ObjectId[];
+  blockedUsers: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
   matchPassword(enteredPassword: string): Promise<boolean>;
@@ -84,7 +88,6 @@ const UserSchema = new mongoose.Schema({
     },
     coordinates: {
       type: [Number],
-      index: '2dsphere',
       required: true,
       default: [0, 0] // [longitude, latitude]
     },
@@ -121,10 +124,30 @@ const UserSchema = new mongoose.Schema({
   lastActive: {
     type: Date,
     default: Date.now
-  }
+  },
+  connections: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  incomingConnectionRequests: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  outgoingConnectionRequests: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  blockedUsers: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }]
 }, {
   timestamps: true
 });
+
+// Create a 2dsphere index on the location field
+// This is required for geospatial queries like $near
+UserSchema.index({ 'location.coordinates': '2dsphere' });
 
 /**
  * Encrypt password using bcrypt

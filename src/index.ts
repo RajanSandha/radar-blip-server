@@ -51,7 +51,7 @@ if (config.nodeEnv === 'development') {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/radar', radarRoutes);
-app.use('/api/pings', pingRoutes);
+app.use('/api/ping', pingRoutes);
 app.use('/api/chats', chatRoutes);
 app.use('/api/users', userRoutes);
 
